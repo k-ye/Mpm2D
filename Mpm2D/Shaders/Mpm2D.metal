@@ -20,18 +20,6 @@ struct Mpm2DParams {
     float E;
 };
 
-kernel void clear_grid(device float* grid_ms [[buffer(0)]],
-                       device float2* grid_vs [[buffer(1)]],
-                       constant const UniformGrid2DParams& ug_params [[buffer(2)]],
-                       const uint tid [[thread_position_in_grid]]) {
-    const int c_idx = (int)tid;
-    if (c_idx >= ug_params.cells_count) {
-        return;
-    }
-    grid_ms[c_idx] = 0;
-    grid_vs[c_idx] = 0;
-}
-
 kernel void p2g(device const float2* positions [[buffer(0)]],
                 device const float2* velocities [[buffer(1)]],
                 device const float2x2* Cs [[buffer(2)]],

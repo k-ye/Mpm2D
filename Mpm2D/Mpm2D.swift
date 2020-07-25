@@ -10,7 +10,6 @@ import Metal
 import simd
 
 fileprivate let kGravityStrength = Float(9.81)
-fileprivate let kClearGridKernel = "clear_grid"
 fileprivate let kP2gKernel = "p2g"
 fileprivate let kAdvectKernel = "advect"
 fileprivate let kG2pKernel = "g2p"
@@ -128,7 +127,6 @@ class Mpm2D: ParticlesProvider, ParticlesInitializer {
     private func initKernelPipelineStates(_ device: MTLDevice) {
         let lib = device.makeDefaultLibrary()!
         for kernelName in [
-            kClearGridKernel,
             kP2gKernel,
             kAdvectKernel,
             kG2pKernel,
@@ -158,25 +156,10 @@ class Mpm2D: ParticlesProvider, ParticlesInitializer {
     }
     
     private func clearGrid(_ commandBuffer: MTLCommandBuffer) {
-//        let blitEncoder = commandBuffer.makeBlitCommandEncoder()!
-//        blitEncoder.fill(buffer: gridMsBuffer, range: 0..<gridMsBuffer.length, value: 0)
-//        blitEncoder.fill(buffer: gridVsBuffer, range: 0..<gridVsBuffer.length, value: 0)
-//        blitEncoder.endEncoding()
-        
-        
-//        device float* grid_ms [[buffer(0)]],
-//        device float2* grid_vs [[buffer(1)]],
-//        constant const UniformGrid2DParams& ug_params [[buffer(2)]],
-        let commandEncoder = commandBuffer.makeComputeCommandEncoder()!
-        let pipelineState = kernelPipelineStates[kClearGridKernel]!
-        commandEncoder.setComputePipelineState(pipelineState)
-        let buffers = [
-            gridMsBuffer,
-            gridVsBuffer,
-            ugPack.buffer,
-        ]
-        let tgParams = Mtl1DThreadGridParams(threadsPerGrid: ugPack.cellsCount, threadsPerGroup: pipelineState.maxTotalThreadsPerThreadgroup)
-        finish(commandEncoder, buffers, tgParams)
+        let blitEncoder = commandBuffer.makeBlitCommandEncoder()!
+        blitEncoder.fill(buffer: gridMsBuffer, range: 0..<gridMsBuffer.length, value: 0)
+        blitEncoder.fill(buffer: gridVsBuffer, range: 0..<gridVsBuffer.length, value: 0)
+        blitEncoder.endEncoding()
     }
     
     private func p2g(_ commandBuffer: MTLCommandBuffer) {
