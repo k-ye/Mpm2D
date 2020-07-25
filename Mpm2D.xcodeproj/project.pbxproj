@@ -14,6 +14,15 @@
 		2142E19824CB9F6C000D75D1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2142E19724CB9F6C000D75D1 /* Assets.xcassets */; };
 		2142E19B24CB9F6C000D75D1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2142E19924CB9F6C000D75D1 /* LaunchScreen.storyboard */; };
 		2142E1A624CB9F6C000D75D1 /* Mpm2DUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2142E1A524CB9F6C000D75D1 /* Mpm2DUITests.swift */; };
+		2142E1B324CBA877000D75D1 /* Mpm2D.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2142E1B224CBA877000D75D1 /* Mpm2D.swift */; };
+		2142E1B524CBA89F000D75D1 /* ParticlesProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2142E1B424CBA89F000D75D1 /* ParticlesProtocols.swift */; };
+		2142E1B724CBA90D000D75D1 /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2142E1B624CBA90D000D75D1 /* Types.swift */; };
+		2142E1B924CBAA54000D75D1 /* UniformGrid2DParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2142E1B824CBAA54000D75D1 /* UniformGrid2DParams.swift */; };
+		2142E1BC24CBAB35000D75D1 /* Mpm2D.metal in Sources */ = {isa = PBXBuildFile; fileRef = 2142E1BB24CBAB35000D75D1 /* Mpm2D.metal */; };
+		2142E1BE24CBAFC7000D75D1 /* Utils.metal in Sources */ = {isa = PBXBuildFile; fileRef = 2142E1BD24CBAFC7000D75D1 /* Utils.metal */; };
+		2142E1C124CBB253000D75D1 /* Render2D.metal in Sources */ = {isa = PBXBuildFile; fileRef = 2142E1C024CBB253000D75D1 /* Render2D.metal */; };
+		2142E1C324CBBA6C000D75D1 /* MetalExts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2142E1C224CBBA6C000D75D1 /* MetalExts.swift */; };
+		2142E1C524CBEF4F000D75D1 /* ParticlesRenderer2D.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2142E1C424CBEF4F000D75D1 /* ParticlesRenderer2D.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +47,17 @@
 		2142E1A124CB9F6C000D75D1 /* Mpm2DUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Mpm2DUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2142E1A524CB9F6C000D75D1 /* Mpm2DUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mpm2DUITests.swift; sourceTree = "<group>"; };
 		2142E1A724CB9F6C000D75D1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2142E1B224CBA877000D75D1 /* Mpm2D.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mpm2D.swift; sourceTree = "<group>"; };
+		2142E1B424CBA89F000D75D1 /* ParticlesProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticlesProtocols.swift; sourceTree = "<group>"; };
+		2142E1B624CBA90D000D75D1 /* Types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
+		2142E1B824CBAA54000D75D1 /* UniformGrid2DParams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UniformGrid2DParams.swift; sourceTree = "<group>"; };
+		2142E1BA24CBAADD000D75D1 /* UniformGrid2D.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UniformGrid2D.h; sourceTree = "<group>"; };
+		2142E1BB24CBAB35000D75D1 /* Mpm2D.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Mpm2D.metal; sourceTree = "<group>"; };
+		2142E1BD24CBAFC7000D75D1 /* Utils.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Utils.metal; sourceTree = "<group>"; };
+		2142E1BF24CBAFCE000D75D1 /* Utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
+		2142E1C024CBB253000D75D1 /* Render2D.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Render2D.metal; sourceTree = "<group>"; };
+		2142E1C224CBBA6C000D75D1 /* MetalExts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalExts.swift; sourceTree = "<group>"; };
+		2142E1C424CBEF4F000D75D1 /* ParticlesRenderer2D.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticlesRenderer2D.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,13 +99,20 @@
 		2142E18D24CB9F6B000D75D1 /* Mpm2D */ = {
 			isa = PBXGroup;
 			children = (
+				2142E19C24CB9F6C000D75D1 /* Info.plist */,
 				2142E18E24CB9F6B000D75D1 /* AppDelegate.swift */,
+				2142E1C224CBBA6C000D75D1 /* MetalExts.swift */,
+				2142E1B224CBA877000D75D1 /* Mpm2D.swift */,
+				2142E1C424CBEF4F000D75D1 /* ParticlesRenderer2D.swift */,
+				2142E1B424CBA89F000D75D1 /* ParticlesProtocols.swift */,
 				2142E19024CB9F6B000D75D1 /* SceneDelegate.swift */,
+				2142E1B624CBA90D000D75D1 /* Types.swift */,
+				2142E1B824CBAA54000D75D1 /* UniformGrid2DParams.swift */,
 				2142E19224CB9F6B000D75D1 /* ViewController.swift */,
-				2142E19424CB9F6B000D75D1 /* Main.storyboard */,
 				2142E19724CB9F6C000D75D1 /* Assets.xcassets */,
 				2142E19924CB9F6C000D75D1 /* LaunchScreen.storyboard */,
-				2142E19C24CB9F6C000D75D1 /* Info.plist */,
+				2142E19424CB9F6B000D75D1 /* Main.storyboard */,
+				2142E1B024CBA85B000D75D1 /* Shaders */,
 			);
 			path = Mpm2D;
 			sourceTree = "<group>";
@@ -97,6 +124,18 @@
 				2142E1A724CB9F6C000D75D1 /* Info.plist */,
 			);
 			path = Mpm2DUITests;
+			sourceTree = "<group>";
+		};
+		2142E1B024CBA85B000D75D1 /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				2142E1BB24CBAB35000D75D1 /* Mpm2D.metal */,
+				2142E1C024CBB253000D75D1 /* Render2D.metal */,
+				2142E1BA24CBAADD000D75D1 /* UniformGrid2D.h */,
+				2142E1BF24CBAFCE000D75D1 /* Utils.h */,
+				2142E1BD24CBAFC7000D75D1 /* Utils.metal */,
+			);
+			path = Shaders;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -200,9 +239,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2142E1C324CBBA6C000D75D1 /* MetalExts.swift in Sources */,
+				2142E1B524CBA89F000D75D1 /* ParticlesProtocols.swift in Sources */,
 				2142E19324CB9F6B000D75D1 /* ViewController.swift in Sources */,
 				2142E18F24CB9F6B000D75D1 /* AppDelegate.swift in Sources */,
+				2142E1B724CBA90D000D75D1 /* Types.swift in Sources */,
+				2142E1BC24CBAB35000D75D1 /* Mpm2D.metal in Sources */,
+				2142E1BE24CBAFC7000D75D1 /* Utils.metal in Sources */,
+				2142E1B324CBA877000D75D1 /* Mpm2D.swift in Sources */,
+				2142E1C524CBEF4F000D75D1 /* ParticlesRenderer2D.swift in Sources */,
+				2142E1B924CBAA54000D75D1 /* UniformGrid2DParams.swift in Sources */,
 				2142E19124CB9F6B000D75D1 /* SceneDelegate.swift in Sources */,
+				2142E1C124CBB253000D75D1 /* Render2D.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -365,6 +413,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = LYKV6GA2N7;
 				INFOPLIST_FILE = Mpm2D/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -383,6 +432,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = LYKV6GA2N7;
 				INFOPLIST_FILE = Mpm2D/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
