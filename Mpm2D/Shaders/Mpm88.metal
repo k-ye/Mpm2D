@@ -1,5 +1,5 @@
 //
-//  Mpm2D.metal
+//  Mpm88.metal
 //  Mpm2D
 //
 //  Created by Ye Kuang on 2020/07/25.
@@ -7,12 +7,14 @@
 //
 
 #include <metal_stdlib>
+
+#include "Mpm2DShared.h"
 #include "UniformGrid2D.h"
 #include "Utils.h"
 
 using namespace metal;
 
-struct Mpm2DParams {
+struct Mpm88Params {
     int particles_count;
     float timestep;
     float mass;
@@ -20,15 +22,16 @@ struct Mpm2DParams {
     float E;
 };
 
-kernel void p2g(device const float2* positions [[buffer(0)]],
-                device const float2* velocities [[buffer(1)]],
-                device const float2x2* Cs [[buffer(2)]],
-                device const float* Js [[buffer(3)]],
-                device float* grid_ms [[buffer(4)]],
-                device float2* grid_vs [[buffer(5)]],
-                constant const UniformGrid2DParams& ug_params [[buffer(6)]],
-                constant const Mpm2DParams& mpm_params [[buffer(7)]],
-                const uint tid [[thread_position_in_grid]]) {
+
+kernel void mpm88_p2g(device const float2* positions [[buffer(0)]],
+                      device const float2* velocities [[buffer(1)]],
+                      device const float2x2* Cs [[buffer(2)]],
+                      device const float* Js [[buffer(3)]],
+                      device float* grid_ms [[buffer(4)]],
+                      device float2* grid_vs [[buffer(5)]],
+                      constant const UniformGrid2DParams& ug_params [[buffer(6)]],
+                      constant const Mpm88Params& mpm_params [[buffer(7)]],
+                      const uint tid [[thread_position_in_grid]]) {
     const int p_i = (int)tid;
     if (p_i >= mpm_params.particles_count) {
         return;
@@ -66,66 +69,25 @@ kernel void p2g(device const float2* positions [[buffer(0)]],
     }
 }
 
-kernel void advect(device float* grid_ms [[buffer(0)]],
-                   device float2* grid_vs [[buffer(1)]],
-                   constant const UniformGrid2DParams& ug_params [[buffer(2)]],
-                   constant const Mpm2DParams& mpm_params [[buffer(3)]],
-                   const uint tid [[thread_position_in_grid]]) {
-    const int c_idx = (int)tid;
-    if (c_idx >= ug_params.cells_count) {
-        return;
-    }
-    
-    const float c_mass = grid_ms[c_idx];
-    if (c_mass <= 0.0) {
-        return;
-    }
-    
-    float2 c_vel = grid_vs[c_idx];
-    c_vel /= c_mass;
-    c_vel += mpm_params.timestep * float2(0, -20.0f);  // gravity
-    
-    constexpr int kBumper = 2;
-    const auto c_i = to_cell(ug_params, c_idx);
-    if (c_i[0] < kBumper && c_vel[0] < 0) {
-        c_vel[0] = 0;
-    }
-    if (c_i[0] >= (ug_params.grid[0] - kBumper) && c_vel[0] > 0) {
-        c_vel[0] = 0;
-    }
-    if (c_i[1] < kBumper && c_vel[1] < 0) {
-        c_vel[1] = 0;
-    }
-    if (c_i[1] >= (ug_params.grid[1] - kBumper) && c_vel[1] > 0) {
-        c_vel[1] = 0;
-    }
-    
-    grid_vs[c_idx] = c_vel;
+kernel void mpm88_advect(device float* grid_ms [[buffer(0)]],
+                         device float2* grid_vs [[buffer(1)]],
+                         constant const UniformGrid2DParams& ug_params [[buffer(2)]],
+                         constant const Mpm88Params& mpm_params [[buffer(3)]],
+                         const uint tid [[thread_position_in_grid]]) {
+    AdvectionParams adv_params;
+    adv_params.timestep = mpm_params.timestep;
+    run_advection(grid_ms, grid_vs, ug_params, adv_params, tid);
 }
 
-float2x2 outer_product(float2 a, float2 b) {
-    // Column major...
-    float2x2 m(0);
-    m[0][0] = a[0] * b[0];
-    m[1][0] = a[0] * b[1];
-    m[0][1] = a[1] * b[0];
-    m[1][1] = a[1] * b[1];
-    return m;
-}
-
-float trace(thread float2x2& m) {
-    return m[0][0] + m[1][1];
-}
-
-kernel void g2p(device float2* positions [[buffer(0)]],
-                device float2* velocities [[buffer(1)]],
-                device float2x2* Cs [[buffer(2)]],
-                device float* Js [[buffer(3)]],
-                device const float* grid_ms [[buffer(4)]],
-                device const float2* grid_vs [[buffer(5)]],
-                constant const UniformGrid2DParams& ug_params [[buffer(6)]],
-                constant const Mpm2DParams& mpm_params [[buffer(7)]],
-                const uint tid [[thread_position_in_grid]]) {
+kernel void mpm88_g2p(device float2* positions [[buffer(0)]],
+                      device float2* velocities [[buffer(1)]],
+                      device float2x2* Cs [[buffer(2)]],
+                      device float* Js [[buffer(3)]],
+                      device const float* grid_ms [[buffer(4)]],
+                      device const float2* grid_vs [[buffer(5)]],
+                      constant const UniformGrid2DParams& ug_params [[buffer(6)]],
+                      constant const Mpm88Params& mpm_params [[buffer(7)]],
+                      const uint tid [[thread_position_in_grid]]) {
     const int p_i = (int)tid;
     if (p_i >= mpm_params.particles_count) {
         return;

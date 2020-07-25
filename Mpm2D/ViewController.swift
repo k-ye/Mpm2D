@@ -20,7 +20,7 @@ class ViewController: UIViewController {
     fileprivate var timer: CADisplayLink!
     
     fileprivate var uniformGridPack: UniformGrid2DParamsHMPack!
-    fileprivate var mpm: Mpm2D!
+    fileprivate var mpm: Mpm2DSolver!
     fileprivate var renderer: ParticlesRenderer2D!
     
     fileprivate var paused = true
@@ -41,7 +41,9 @@ class ViewController: UIViewController {
         metalLayer.frame = view.layer.frame
         view.layer.addSublayer(metalLayer)
         
-        initMpm(boundary: to(view.bounds.size) * 0.1)
+        let boundary = to(view.bounds.size) * 0.2
+        initUniformGrid(boundary: boundary)
+        initMpm(boundary: boundary)
         initRenderer()
         
         timer = CADisplayLink(target: self, selector: #selector(renderLoop))
@@ -50,22 +52,37 @@ class ViewController: UIViewController {
         view.addGestureRecognizer(tapGestureRecognizer)
     }
     
-    private func initMpm(boundary: Float2) {
+    private func initUniformGrid(boundary: Float2) {
         let cellSize: Float = 1.0
         let ugParams = UniformGrid2DParams(boundary: boundary, cellSize: cellSize)
         uniformGridPack = UniformGrid2DParamsHMPack(ugParams, device)
         
+        let ug = uniformGridPack.params
+        print("UniformGrid boundary=\(ug.boundary) grid=\(ug.grid) cellSize=\(cellSize) cellsCount=\(ug.cellsCount)")
+    }
+    
+    private func initMpm(boundary: Float2) {
         let particlesCount = 8192
-        mpm = Mpm2D.Builder()
+//        mpm = MpmFluidSolverBuilder()
+//            .set(uniformGridPack)
+//            .set(itersCount: 5)
+//            .set(particlesCount: particlesCount)
+//            .set(timestep: 10.0 / 1e3)
+//            .set(restDensity: 1.0)
+//            .set(dynamicViscosity: 0.1)
+//            .set(eosStiffness: 10.0)
+//            .set(eosPower: 4.0)
+//            .build(device)
+        mpm = Mpm88SolverBuilder()
             .set(uniformGridPack)
-            .set(itersCount: 6)
+            .set(itersCount: 5)
             .set(particlesCount: particlesCount)
-            .set(timestep: 5.0 / 1e3)
+            .set(timestep: 10.0 / 1e3)
             .set(rho: 1.0)
             .set(E: 400.0)
             .build(device)
         
-        let sideSize = min(boundary[0], boundary[1]) * 0.4
+        let sideSize = min(boundary[0], boundary[1]) * 0.5
         let offsetX = (boundary[0] - sideSize) * 0.5
         let offsetY = (boundary[1] - sideSize) * 0.5
         for i in 0..<particlesCount {
@@ -93,7 +110,6 @@ class ViewController: UIViewController {
     private func renderOnce() {
         let drawable = metalLayer.nextDrawable()!
         let commandBuffer = commandQueue.makeCommandBuffer()!
-        
         if !paused {
             mpm.update(commandBuffer)
         }

@@ -11,6 +11,8 @@
 
 #include "UniformGrid2D.h"
 
+using namespace metal;
+
 float fatomic_fetch_add(device float *dest, const float operand);
 
 void f2atomic_fetch_add(device float2* addr, float2 operand);
@@ -31,5 +33,9 @@ int to_cell_index(constant const UniformGrid2DParams& c, thread const float2& po
 int2 to_cell(constant const UniformGrid2DParams& c, int cell_index);
 
 bool is_in_grid(constant const UniformGrid2DParams& c, const int2 cell);
+
+float trace(thread float2x2& m);
+
+float2x2 outer_product(float2 a, float2 b);
 
 #endif /* Utils_h */

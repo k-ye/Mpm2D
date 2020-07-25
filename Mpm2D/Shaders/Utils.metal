@@ -80,3 +80,17 @@ bool is_in_grid(constant const UniformGrid2DParams& c, const int2 cell) {
     return (0 <= cell[0] && cell[0] < c.grid[0] &&
             0 <= cell[1] && cell[1] < c.grid[1]);
 }
+
+float trace(thread float2x2& m) {
+    return m[0][0] + m[1][1];
+}
+
+float2x2 outer_product(float2 a, float2 b) {
+    // Column major...
+    float2x2 m(0);
+    m[0][0] = a[0] * b[0];
+    m[1][0] = a[0] * b[1];
+    m[0][1] = a[1] * b[0];
+    m[1][1] = a[1] * b[1];
+    return m;
+}
