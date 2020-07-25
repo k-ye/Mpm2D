@@ -14,7 +14,6 @@ func to(_ sz: CGSize) -> Float2 {
 }
 
 class ViewController: UIViewController {
-    
     fileprivate var device: MTLDevice!
     fileprivate var commandQueue: MTLCommandQueue!
     fileprivate var metalLayer: CAMetalLayer!
@@ -23,6 +22,9 @@ class ViewController: UIViewController {
     fileprivate var uniformGridPack: UniformGrid2DParamsHMPack!
     fileprivate var mpm: Mpm2D!
     fileprivate var renderer: ParticlesRenderer2D!
+    
+    fileprivate var paused = true
+    @IBOutlet var tapGestureRecognizer: UITapGestureRecognizer!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,6 +46,8 @@ class ViewController: UIViewController {
         
         timer = CADisplayLink(target: self, selector: #selector(renderLoop))
         timer.add(to: .main, forMode: .default)
+        
+        view.addGestureRecognizer(tapGestureRecognizer)
     }
     
     private func initMpm(boundary: Float2) {
@@ -51,7 +55,7 @@ class ViewController: UIViewController {
         let ugParams = UniformGrid2DParams(boundary: boundary, cellSize: cellSize)
         uniformGridPack = UniformGrid2DParamsHMPack(ugParams, device)
         
-        let particlesCount = 4096
+        let particlesCount = 8192
         mpm = Mpm2D.Builder()
             .set(uniformGridPack)
             .set(itersCount: 6)
@@ -86,13 +90,20 @@ class ViewController: UIViewController {
         }
     }
     
-    func renderOnce() {
+    private func renderOnce() {
         let drawable = metalLayer.nextDrawable()!
         let commandBuffer = commandQueue.makeCommandBuffer()!
         
-        mpm.update(commandBuffer)
+        if !paused {
+            mpm.update(commandBuffer)
+        }
         renderer.render(drawable, commandBuffer)
         commandBuffer.commit()
         commandBuffer.waitUntilCompleted()
+    }
+    
+    
+    @IBAction func handleTap(_ sender: UITapGestureRecognizer) {
+        paused = !paused
     }
 }
