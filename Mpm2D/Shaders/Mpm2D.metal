@@ -102,13 +102,13 @@ kernel void advect(device float* grid_ms [[buffer(0)]],
     if (c_i[0] < kBumper && c_vel[0] < 0) {
         c_vel[0] = 0;
     }
-    if (c_i[0] <= (ug_params.grid[0] - kBumper) && c_vel[0] > 0) {
+    if (c_i[0] >= (ug_params.grid[0] - kBumper) && c_vel[0] > 0) {
         c_vel[0] = 0;
     }
     if (c_i[1] < kBumper && c_vel[1] < 0) {
         c_vel[1] = 0;
     }
-    if (c_i[1] <= (ug_params.grid[1] - kBumper) && c_vel[1] > 0) {
+    if (c_i[1] >= (ug_params.grid[1] - kBumper) && c_vel[1] > 0) {
         c_vel[1] = 0;
     }
     
@@ -118,8 +118,8 @@ kernel void advect(device float* grid_ms [[buffer(0)]],
 float2x2 outer_product(float2 a, float2 b) {
     float2x2 m(0);
     m[0][0] = a[0] * b[0];
-    m[1][0] = a[1] * b[0];
-    m[0][1] = a[0] * b[1];
+    m[1][0] = a[0] * b[1];
+    m[0][1] = a[1] * b[0];
     m[1][1] = a[1] * b[1];
     return m;
 }

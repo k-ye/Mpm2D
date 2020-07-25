@@ -51,12 +51,12 @@ class ViewController: UIViewController {
         let ugParams = UniformGrid2DParams(boundary: boundary, cellSize: cellSize)
         uniformGridPack = UniformGrid2DParamsHMPack(ugParams, device)
         
-        let particlesCount = 8192
+        let particlesCount = 4096
         mpm = Mpm2D.Builder()
             .set(uniformGridPack)
-            .set(itersCount: 20)
+            .set(itersCount: 6)
             .set(particlesCount: particlesCount)
-            .set(timestep: 1.0 / 1e3)
+            .set(timestep: 5.0 / 1e3)
             .set(rho: 1.0)
             .set(E: 400.0)
             .build(device)
