@@ -30,7 +30,8 @@ class ViewController: UIViewController {
     fileprivate var paused = true
     
     let motion = CMMotionManager()
-    @IBOutlet var tapGestureRecognizer: UITapGestureRecognizer!
+    @IBOutlet var singleTapGesture: UITapGestureRecognizer!
+    @IBOutlet var doubleTapGesture: UITapGestureRecognizer!
     @IBOutlet weak var mpmSelector: UISegmentedControl!
     
     override func viewDidLoad() {
@@ -58,7 +59,12 @@ class ViewController: UIViewController {
         timer = CADisplayLink(target: self, selector: #selector(renderLoop))
         timer.add(to: .main, forMode: .default)
         
-        view.addGestureRecognizer(tapGestureRecognizer)
+        singleTapGesture.numberOfTapsRequired = 1
+        doubleTapGesture.numberOfTapsRequired = 2
+        view.addGestureRecognizer(singleTapGesture)
+        view.addGestureRecognizer(doubleTapGesture)
+        // https://stackoverflow.com/a/8876299/12003165
+        singleTapGesture.require(toFail: doubleTapGesture)
         
         // https://developer.apple.com/documentation/coremotion/getting_raw_accelerometer_events
         if motion.isAccelerometerAvailable {
@@ -66,11 +72,7 @@ class ViewController: UIViewController {
             motion.startAccelerometerUpdates()
         }
         
-        self.becomeFirstResponder() // To get shake gesture
-    }
-    
-    override var canBecomeFirstResponder: Bool {
-        get { return true }
+//        self.becomeFirstResponder() // To get shake gesture
     }
     
     private func initUniformGrid() {
@@ -163,13 +165,11 @@ class ViewController: UIViewController {
         initMpmByIndex(sender.selectedSegmentIndex, transferrable: mpm.getTransferrable())
     }
     
-    @IBAction func handleTap(_ sender: UITapGestureRecognizer) {
+    @IBAction func handleSingleTap(_ sender: UITapGestureRecognizer) {
         paused = !paused
     }
     
-    override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
-        guard motion == .motionShake else { return }
-        
+    @IBAction func handleDoubleTap(_ sender: UITapGestureRecognizer) {
         paused = true
         let alert = UIAlertController(title: "Reset?", message: "Shake to reset the particles", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in

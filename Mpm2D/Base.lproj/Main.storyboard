@@ -16,13 +16,13 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="dlp-fa-vwt">
-                                <rect key="frame" x="117.5" y="815" width="179" height="32"/>
+                                <rect key="frame" x="140.5" y="815" width="133" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="31" id="oLq-cm-y3P"/>
                                 </constraints>
                                 <segments>
                                     <segment title="mpm88"/>
-                                    <segment title="mpm-nialltl"/>
+                                    <segment title="nialltl"/>
                                 </segments>
                                 <connections>
                                     <action selector="onPickerIndexChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="Dys-Is-ELd"/>
@@ -37,14 +37,20 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
+                        <outlet property="doubleTapGesture" destination="ehN-hJ-ez9" id="baw-Fx-Nko"/>
                         <outlet property="mpmSelector" destination="dlp-fa-vwt" id="bea-mD-TkF"/>
-                        <outlet property="tapGestureRecognizer" destination="Yca-0R-Uwv" id="DTi-Ah-msh"/>
+                        <outlet property="singleTapGesture" destination="Yca-0R-Uwv" id="DTi-Ah-msh"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
                 <tapGestureRecognizer id="Yca-0R-Uwv">
                     <connections>
-                        <action selector="handleTap:" destination="BYZ-38-t0r" id="Mnd-Gu-ccm"/>
+                        <action selector="handleSingleTap:" destination="BYZ-38-t0r" id="Mnd-Gu-ccm"/>
+                    </connections>
+                </tapGestureRecognizer>
+                <tapGestureRecognizer numberOfTapsRequired="2" id="ehN-hJ-ez9">
+                    <connections>
+                        <action selector="handleDoubleTap:" destination="BYZ-38-t0r" id="zWU-bL-kNd"/>
                     </connections>
                 </tapGestureRecognizer>
             </objects>

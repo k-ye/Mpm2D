@@ -11,7 +11,7 @@ import UIKit
 
 fileprivate let kVertKernel = "point_vertex"
 fileprivate let kFragKernel = "point_fragment"
-fileprivate let kClearColor = MTLClearColor(red: 0.2, green: 0.3, blue: 0.3, alpha: 1.0)
+fileprivate let kClearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 1.0)
 
 class ParticlesRenderer2D {
     class Builder {
