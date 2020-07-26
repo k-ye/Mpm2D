@@ -15,13 +15,7 @@ fileprivate let kClearColor = MTLClearColor(red: 0.2, green: 0.3, blue: 0.3, alp
 
 class ParticlesRenderer2D {
     class Builder {
-        fileprivate var particles: ParticlesProvider!
         fileprivate var ug: UniformGrid2DParamsHMPack!
-        
-        func set(_ particles: ParticlesProvider) -> Builder {
-            self.particles = particles
-            return self
-        }
         
         func set(_ ug: UniformGrid2DParamsHMPack) -> Builder {
             self.ug = ug
@@ -33,12 +27,10 @@ class ParticlesRenderer2D {
         }
     }
     
-    private var particles: ParticlesProvider!
     private var ugPack: UniformGrid2DParamsHMPack!
     private let renderPipelineState: MTLRenderPipelineState
     
     fileprivate init(_ b: Builder, _ device: MTLDevice) {
-        self.particles = b.particles
         self.ugPack = b.ug
         
         let defaultLib = device.makeDefaultLibrary()!
@@ -55,7 +47,7 @@ class ParticlesRenderer2D {
         
     }
     
-    func render(_ drawable: CAMetalDrawable, _ commandBuffer: MTLCommandBuffer) {
+    func render(_ particles: ParticlesProvider, _ drawable: CAMetalDrawable, _ commandBuffer: MTLCommandBuffer) {
         let texture = drawable.texture
         let renderPassDesc = MTLRenderPassDescriptor()
         
