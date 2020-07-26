@@ -14,7 +14,7 @@ func to(_ sz: CGSize) -> Float2 {
     return Float2(Float(sz.width), Float(sz.height))
 }
 
-fileprivate let kParticlesCount = 8192
+fileprivate let kParticlesCount = 16384
 
 class ViewController: UIViewController {
     fileprivate var device: MTLDevice!
@@ -104,12 +104,12 @@ class ViewController: UIViewController {
         }
         return MpmFluidSolverBuilder()
             .set(uniformGridPack)
-            .set(itersCount: 5)
+            .set(itersCount: 2)
             .set(particlesCount: kParticlesCount)
-            .set(timestep: 10.0 / 1e3)
+            .set(timestep: 25.0 / 1e3)
             .set(restDensity: 1.0)
             .set(dynamicViscosity: 0.1)
-            .set(eosStiffness: 10.0)
+            .set(eosStiffness: 2.0)
             .set(eosPower: 4.0)
             .build(device)
     }
