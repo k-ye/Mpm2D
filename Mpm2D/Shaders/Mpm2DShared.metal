@@ -29,7 +29,7 @@ void run_advection(device float* grid_ms,
     
     float2 c_vel = grid_vs[c_idx];
     c_vel /= c_mass;
-    c_vel += adv_params.timestep * float2(0, -9.8f);  // gravity
+    c_vel += adv_params.timestep * adv_params.gravity;  // gravity
     
     constexpr int kBumper = 2;
     const auto c_i = to_cell(ug_params, c_idx);

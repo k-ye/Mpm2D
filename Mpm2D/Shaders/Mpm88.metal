@@ -73,9 +73,11 @@ kernel void mpm88_advect(device float* grid_ms [[buffer(0)]],
                          device float2* grid_vs [[buffer(1)]],
                          constant const UniformGrid2DParams& ug_params [[buffer(2)]],
                          constant const Mpm88Params& mpm_params [[buffer(3)]],
+                         constant const float2& gravity [[buffer(4)]],
                          const uint tid [[thread_position_in_grid]]) {
     AdvectionParams adv_params;
     adv_params.timestep = mpm_params.timestep;
+    adv_params.gravity = gravity;
     run_advection(grid_ms, grid_vs, ug_params, adv_params, tid);
 }
 

@@ -13,6 +13,7 @@
 
 struct AdvectionParams {
     float timestep;
+    float2 gravity;
 };
 
 void run_advection(device float* grid_ms,

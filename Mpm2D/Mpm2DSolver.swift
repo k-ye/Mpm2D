@@ -104,6 +104,7 @@ fileprivate class Mpm2DSolverShared {
             gridVsBuffer,
             ugPack.buffer,
             paramsBuffer,
+            gravityBuffer!,
         ]
         let tgParams = Mtl1DThreadGridParams(threadsPerGrid: ugPack.cellsCount, threadsPerGroup: pipelineState.maxTotalThreadsPerThreadgroup)
         finish(commandEncoder, buffers, tgParams)

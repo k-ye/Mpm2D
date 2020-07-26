@@ -15,9 +15,11 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="dlp-fa-vwt">
-                                <rect key="frame" x="140" y="44" width="135" height="32"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="dlp-fa-vwt">
+                                <rect key="frame" x="139.5" y="815" width="135" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="31" id="oLq-cm-y3P"/>
+                                </constraints>
                                 <segments>
                                     <segment title="MPM88"/>
                                     <segment title="Fluid"/>
@@ -28,6 +30,10 @@
                             </segmentedControl>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="dlp-fa-vwt" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="4LN-id-342"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="dlp-fa-vwt" secondAttribute="bottom" constant="16" id="bRz-s6-Iml"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>

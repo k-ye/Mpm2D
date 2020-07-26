@@ -6,6 +6,7 @@
 //  Copyright © 2020 zkk. All rights reserved.
 //
 
+import CoreMotion
 import Metal
 import UIKit
 
@@ -27,7 +28,8 @@ class ViewController: UIViewController {
     fileprivate var renderer: ParticlesRenderer2D!
     
     fileprivate var paused = true
-
+    
+    let motion = CMMotionManager()
     @IBOutlet var tapGestureRecognizer: UITapGestureRecognizer!
     @IBOutlet weak var mpmSelector: UISegmentedControl!
     
@@ -56,6 +58,12 @@ class ViewController: UIViewController {
         timer.add(to: .main, forMode: .default)
         
         view.addGestureRecognizer(tapGestureRecognizer)
+        
+        // https://developer.apple.com/documentation/coremotion/getting_raw_accelerometer_events
+        if motion.isAccelerometerAvailable {
+            motion.accelerometerUpdateInterval = 1.0 / 60.0  // 60 Hz
+            motion.startAccelerometerUpdates()
+        }
     }
     
     private func initUniformGrid() {
@@ -118,10 +126,19 @@ class ViewController: UIViewController {
         }
     }
     
+    private func processAccelerometer() {
+        if let data = motion.accelerometerData {
+            let x = Float(data.acceleration.x)
+            let y = Float(data.acceleration.y)
+            mpm.set(gravity: Float2(x, y))
+        }
+    }
+    
     private func renderOnce() {
         let drawable = metalLayer.nextDrawable()!
         let commandBuffer = commandQueue.makeCommandBuffer()!
         if !paused {
+            processAccelerometer()
             mpm.update(commandBuffer)
         }
         renderer.render(mpm, drawable, commandBuffer)
