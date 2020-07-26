@@ -22,6 +22,7 @@ struct Mtl1DThreadGridParams {
 protocol Mpm2DSolver: ParticlesInitializer, ParticlesProvider {
     func update(_ commandBuffer: MTLCommandBuffer)
     func set(gravity: Float2)
+    func getTransferrable() -> Mpm2DTransferrableData
 }
 
 fileprivate let kGravityStrength = Float(9.81)
@@ -56,22 +57,49 @@ fileprivate class Mpm2DSolverShared {
     
     private var kernelPipelineStates: ComputePipelineStatesMap
     
-    init(_ particlesCount: Int, _ ug: UniformGrid2DParamsHMPack, kernelNames: [String], _ device: MTLDevice) {
-        self.particlesCount = particlesCount
-        self.ugPack = ug
+    class Builder {
+        var ug: UniformGrid2DParamsHMPack!
+        var particlesCount: Int = .zero
+        var kernelNames = [String]()
+        var transferrable: Mpm2DTransferrableData?
         
-        positionsBuffer = device.makeBuffer(length: particlesCount * MemoryLayout<Float2>.stride, options: [])!
-        velocitiesBuffer = device.makeBuffer(length: particlesCount * MemoryLayout<Float2>.stride, options: [])!
-        CsBuffer = device.makeBuffer(length: particlesCount * MemoryLayout<simd_float2x2>.stride, options: [])!
+        func build(_ device: MTLDevice) -> Mpm2DSolverShared {
+            return Mpm2DSolverShared(self, device)
+        }
+    }
+    
+    private init(_ b: Builder, _ device: MTLDevice) {
+        if let other = b.transferrable?.shared {
+            print("init shared from other shared")
+            self.particlesCount = other.particlesCount
+            self.ugPack = other.ugPack
+            
+            positionsBuffer = other.positionsBuffer
+            velocitiesBuffer = other.velocitiesBuffer
+            CsBuffer = other.CsBuffer
+            
+            gridMsBuffer = other.gridMsBuffer
+            gridVsBuffer = other.gridVsBuffer
+            
+            gravityBuffer = other.gravityBuffer
+        } else {
+            print("init shared from scratch")
+            self.particlesCount = b.particlesCount
+            self.ugPack = b.ug
+            
+            positionsBuffer = device.makeBuffer(length: particlesCount * MemoryLayout<Float2>.stride, options: [])!
+            velocitiesBuffer = device.makeBuffer(length: particlesCount * MemoryLayout<Float2>.stride, options: [])!
+            CsBuffer = device.makeBuffer(length: particlesCount * MemoryLayout<simd_float2x2>.stride, options: [])!
+            
+            let cellsCount = ugPack.cellsCount
+            gridMsBuffer = device.makeBuffer(length: cellsCount * MemoryLayout<Float>.stride, options: [])!
+            gridVsBuffer = device.makeBuffer(length: cellsCount * MemoryLayout<Float2>.stride, options: [])!
+            
+            var initGravity = Float2(0, -kGravityStrength)
+            gravityBuffer = device.makeBuffer(bytes: &initGravity, length: MemoryLayout<Float2>.stride, options: [])!
+        }
         
-        let cellsCount = ugPack.cellsCount
-        gridMsBuffer = device.makeBuffer(length: cellsCount * MemoryLayout<Float>.stride, options: [])!
-        gridVsBuffer = device.makeBuffer(length: cellsCount * MemoryLayout<Float2>.stride, options: [])!
-        
-        var initGravity = Float2(0, -kGravityStrength)
-        gravityBuffer = device.makeBuffer(bytes: &initGravity, length: MemoryLayout<Float2>.stride, options: [])!
-        
-        kernelPipelineStates = makeComputePipelineStatesMap(with: kernelNames, device)
+        kernelPipelineStates = makeComputePipelineStatesMap(with: b.kernelNames, device)
     }
     
     func initParticle(_ i: Int, _ pos: Float2, _ vel: Float2) {
@@ -118,12 +146,21 @@ fileprivate class Mpm2DSolverShared {
     }
 }
 
+class Mpm2DTransferrableData {
+    fileprivate var shared: Mpm2DSolverShared
+    
+    fileprivate init(_ s: Mpm2DSolverShared) {
+        self.shared = s
+    }
+}
+
 // MPM88 Solver
 // https://github.com/taichi-dev/taichi/blob/master/examples/mpm88.py
 class Mpm88SolverBuilder {
     fileprivate var params = Mpm88Solver.Params()
     fileprivate var ug: UniformGrid2DParamsHMPack!
     fileprivate var itersCount: Int = .zero
+    fileprivate var transferrable: Mpm2DTransferrableData?
     
     var volume: Float {
         get { return volumeOfCell(ug) }
@@ -156,6 +193,11 @@ class Mpm88SolverBuilder {
     
     func set(E: Float) -> Mpm88SolverBuilder {
         self.params.E = E
+        return self
+    }
+    
+    func set(_ transferrable: Mpm2DTransferrableData?) -> Mpm88SolverBuilder {
+        self.transferrable = transferrable
         return self
     }
     
@@ -197,15 +239,20 @@ fileprivate class Mpm88Solver: Mpm2DSolver {
         self.params = b.params
         self.paramsBuffer = device.makeBuffer(bytes: &params, length: MemoryLayout<Params>.stride, options: [])!
         self.itersCount = b.itersCount
-        self.shared = Mpm2DSolverShared(
-            Int(b.params.particlesCount),
-            b.ug,
-            kernelNames: [
-                Mpm88Solver.kP2gKernel,
-                Mpm88Solver.kAdvectKernel,
-                Mpm88Solver.kG2pKernel,
-            ],
-            device)
+        
+        let sharedBuilder = Mpm2DSolverShared.Builder()
+        if let tr = b.transferrable {
+            sharedBuilder.transferrable = tr
+        } else {
+            sharedBuilder.particlesCount = Int(b.params.particlesCount)
+            sharedBuilder.ug = b.ug
+        }
+        sharedBuilder.kernelNames = [
+            Mpm88Solver.kP2gKernel,
+            Mpm88Solver.kAdvectKernel,
+            Mpm88Solver.kG2pKernel,
+        ]
+        self.shared = sharedBuilder.build(device)
         
         let Js = [Float](repeating: 1.0, count: shared.particlesCount)
         JsBuffer = device.makeBuffer(bytes: Js, length: shared.particlesCount * MemoryLayout<Float>.stride, options: [])!
@@ -227,6 +274,10 @@ fileprivate class Mpm88Solver: Mpm2DSolver {
     
     func set(gravity: Float2) {
         shared.set(gravity: gravity)
+    }
+    
+    func getTransferrable() -> Mpm2DTransferrableData {
+        return Mpm2DTransferrableData(shared)
     }
     
     private func p2g(_ commandBuffer: MTLCommandBuffer) {
@@ -276,6 +327,7 @@ class MpmFluidSolverBuilder {
     fileprivate var params = MpmFluidSolver.Params()
     fileprivate var ug: UniformGrid2DParamsHMPack!
     fileprivate var itersCount: Int = .zero
+    fileprivate var transferrable: Mpm2DTransferrableData?
     
     var volume: Float {
         get { return volumeOfCell(ug) }
@@ -318,6 +370,11 @@ class MpmFluidSolverBuilder {
     
     func set(eosPower: Float) -> MpmFluidSolverBuilder {
         self.params.eosPower = eosPower
+        return self
+    }
+    
+    func set(_ transferrable: Mpm2DTransferrableData?) -> MpmFluidSolverBuilder {
+        self.transferrable = transferrable
         return self
     }
     
@@ -364,16 +421,21 @@ fileprivate class MpmFluidSolver: Mpm2DSolver {
         self.params = b.params
         self.paramsBuffer = device.makeBuffer(bytes: &params, length: MemoryLayout<Params>.stride, options: [])!
         self.itersCount = b.itersCount
-        self.shared = Mpm2DSolverShared(
-            Int(b.params.particlesCount),
-            b.ug,
-            kernelNames:[
-                MpmFluidSolver.kP2g1Kernel,
-                MpmFluidSolver.kP2g2Kernel,
-                MpmFluidSolver.kAdvectKernel,
-                MpmFluidSolver.kG2pKernel,
-            ],
-            device)
+        
+        let sharedBuilder = Mpm2DSolverShared.Builder()
+        if let tr = b.transferrable {
+            sharedBuilder.transferrable = tr
+        } else {
+            sharedBuilder.particlesCount = Int(b.params.particlesCount)
+            sharedBuilder.ug = b.ug
+        }
+        sharedBuilder.kernelNames = [
+            MpmFluidSolver.kP2g1Kernel,
+            MpmFluidSolver.kP2g2Kernel,
+            MpmFluidSolver.kAdvectKernel,
+            MpmFluidSolver.kG2pKernel,
+        ]
+        self.shared = sharedBuilder.build(device)
     }
     
     func initParticle(i: Int, pos: Float2, vel: Float2) {
@@ -382,6 +444,10 @@ fileprivate class MpmFluidSolver: Mpm2DSolver {
     
     func set(gravity: Float2) {
         shared.set(gravity: gravity)
+    }
+    
+    func getTransferrable() -> Mpm2DTransferrableData {
+        return Mpm2DTransferrableData(shared)
     }
     
     func update(_ commandBuffer: MTLCommandBuffer) {

@@ -52,6 +52,7 @@ class ViewController: UIViewController {
         mpmBoundary = to(view.bounds.size) * 0.2
         initUniformGrid()
         initMpmByIndex(mpmSelector.selectedSegmentIndex)
+        initPartciles()
         initRenderer()
         
         timer = CADisplayLink(target: self, selector: #selector(renderLoop))
@@ -76,9 +77,38 @@ class ViewController: UIViewController {
     }
     
     private func initMpmByIndex(_ mpmIdx: Int) {
-        paused = true
-        mpm = makeMpmByIndex(mpmIdx)
-
+        initMpmByIndex(mpmIdx, transferrable: nil)
+    }
+    
+    private func initMpmByIndex(_ mpmIdx: Int, transferrable: Mpm2DTransferrableData?) {
+        let make = { () -> Mpm2DSolver in
+            if mpmIdx == 0 {
+                return Mpm88SolverBuilder()
+                    .set(self.uniformGridPack)
+                    .set(itersCount: 5)
+                    .set(particlesCount: kParticlesCount)
+                    .set(timestep: 10.0 / 1e3)
+                    .set(rho: 1.0)
+                    .set(E: 400.0)
+                    .set(transferrable)
+                    .build(self.device)
+            }
+            return MpmFluidSolverBuilder()
+                .set(self.uniformGridPack)
+                .set(itersCount: 2)
+                .set(particlesCount: kParticlesCount)
+                .set(timestep: 25.0 / 1e3)
+                .set(restDensity: 1.0)
+                .set(dynamicViscosity: 0.1)
+                .set(eosStiffness: 2.0)
+                .set(eosPower: 4.0)
+                .set(transferrable)
+                .build(self.device)
+        }
+        mpm = make()
+    }
+    
+    private func initPartciles() {
         let sideSize = min(mpmBoundary[0], mpmBoundary[1]) * 0.5
         let offsetX = (mpmBoundary[0] - sideSize) * 0.5
         let offsetY = (mpmBoundary[1] - sideSize) * 0.5
@@ -89,29 +119,6 @@ class ViewController: UIViewController {
                              Float.random(in: -1.0..<0.0) - 0.5)
             mpm.initParticle(i: i, pos: pos, vel: vel)
         }
-    }
-    
-    private func makeMpmByIndex(_ i: Int) -> Mpm2DSolver {
-        if i == 0 {
-            return Mpm88SolverBuilder()
-                .set(uniformGridPack)
-                .set(itersCount: 5)
-                .set(particlesCount: kParticlesCount)
-                .set(timestep: 10.0 / 1e3)
-                .set(rho: 1.0)
-                .set(E: 400.0)
-                .build(device)
-        }
-        return MpmFluidSolverBuilder()
-            .set(uniformGridPack)
-            .set(itersCount: 2)
-            .set(particlesCount: kParticlesCount)
-            .set(timestep: 25.0 / 1e3)
-            .set(restDensity: 1.0)
-            .set(dynamicViscosity: 0.1)
-            .set(eosStiffness: 2.0)
-            .set(eosPower: 4.0)
-            .build(device)
     }
     
     private func initRenderer() {
@@ -147,7 +154,7 @@ class ViewController: UIViewController {
     }
     
     @IBAction func onPickerIndexChanged(_ sender: UISegmentedControl) {
-        initMpmByIndex(sender.selectedSegmentIndex)
+        initMpmByIndex(sender.selectedSegmentIndex, transferrable: mpm.getTransferrable())
     }
     
     @IBAction func handleTap(_ sender: UITapGestureRecognizer) {
