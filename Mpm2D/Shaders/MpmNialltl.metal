@@ -163,42 +163,8 @@ kernel void nialltl_g2p(device float2* positions [[buffer(0)]],
                         constant const UniformGrid2DParams& ug_params [[buffer(5)]],
                         constant const MpmFluidParams& mpm_params [[buffer(6)]],
                         const uint tid [[thread_position_in_grid]]) {
-    const int p_i = (int)tid;
-    if (p_i >= mpm_params.particles_count) {
-        return;
-    }
-    
-    const float cell_size = ug_params.cell_size;
-    const float inv_cell = 1.0f / cell_size;
-    const float2 pos_i = positions[p_i];
-    const int2 p_cell = to_cell(ug_params, pos_i);
-    const float2 fx = pos_i * inv_cell - castf(p_cell) - 0.5f;
-    const float2 ws[3] = {
-        0.5f * sqr(0.5f - fx),
-        0.75f - sqr(fx),
-        0.5f * sqr(0.5f + fx),
-    };
-    
-    float2 new_v(0.0f);
-    float2x2 new_C(0.0f);
-    for (int i = 0; i < 3; ++i) {
-        for (int j = 0; j < 3; ++j) {
-            const int2 cell_i = p_cell + int2(i - 1, j - 1);
-            if (!is_in_grid(ug_params, cell_i)) {
-                continue;
-            }
-            const int cell_idx = to_cell_index(ug_params, cell_i);
-            const float2 dpos = (castf(cell_i) + 0.5) * cell_size - pos_i;
-            const float2 c_vel = grid_vs[cell_idx];
-            const float w = ws[i][0] * ws[j][1];
-            
-            new_v += w * c_vel;
-            new_C += w * outer_product(c_vel, dpos) * 4.0f * inv_cell * inv_cell;
-        }
-    }
-    
-    const float dt = mpm_params.timestep;
-    velocities[p_i] = new_v;
-    positions[p_i] += new_v * dt;
-    Cs[p_i] = new_C;
+    G2pParams g2p_params;
+    g2p_params.particles_count = mpm_params.particles_count;
+    g2p_params.timestep = mpm_params.timestep;
+    run_g2p(positions, velocities, Cs, grid_ms, grid_vs, ug_params, g2p_params, tid);
 }
