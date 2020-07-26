@@ -70,7 +70,6 @@ fileprivate class Mpm2DSolverShared {
     
     private init(_ b: Builder, _ device: MTLDevice) {
         if let other = b.transferrable?.shared {
-            print("init shared from other shared")
             self.particlesCount = other.particlesCount
             self.ugPack = other.ugPack
             
@@ -83,7 +82,6 @@ fileprivate class Mpm2DSolverShared {
             
             gravityBuffer = other.gravityBuffer
         } else {
-            print("init shared from scratch")
             self.particlesCount = b.particlesCount
             self.ugPack = b.ug
             

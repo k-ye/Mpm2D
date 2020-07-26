@@ -65,6 +65,12 @@ class ViewController: UIViewController {
             motion.accelerometerUpdateInterval = 1.0 / 60.0  // 60 Hz
             motion.startAccelerometerUpdates()
         }
+        
+        self.becomeFirstResponder() // To get shake gesture
+    }
+    
+    override var canBecomeFirstResponder: Bool {
+        get { return true }
     }
     
     private func initUniformGrid() {
@@ -159,5 +165,21 @@ class ViewController: UIViewController {
     
     @IBAction func handleTap(_ sender: UITapGestureRecognizer) {
         paused = !paused
+    }
+    
+    override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+        guard motion == .motionShake else { return }
+        
+        paused = true
+        let alert = UIAlertController(title: "Reset?", message: "Shake to reset the particles", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
+            self.initMpmByIndex(self.mpmSelector.selectedSegmentIndex)
+            self.initPartciles()
+        }))
+        alert.addAction(UIAlertAction(title: "No", style: .cancel, handler: { action in
+            self.paused = false
+        }))
+
+        present(alert, animated: true)
     }
 }
