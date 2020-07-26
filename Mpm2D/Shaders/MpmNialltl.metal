@@ -1,5 +1,5 @@
 //
-//  MpmFluid.metal
+//  MpmNialltl.metal
 //  Mpm2D
 //
 //  Created by Ye Kuang on 2020/07/25.
@@ -28,14 +28,14 @@ struct MpmFluidParams {
     float eos_power;
 };
 
-kernel void mpm_fluid_p2g1(device const float2* positions [[buffer(0)]],
-                           device const float2* velocities [[buffer(1)]],
-                           device const float2x2* Cs [[buffer(2)]],
-                           device float* grid_ms [[buffer(3)]],
-                           device float2* grid_vs [[buffer(4)]],
-                           constant const UniformGrid2DParams& ug_params [[buffer(5)]],
-                           constant const MpmFluidParams& mpm_params [[buffer(6)]],
-                           const uint tid [[thread_position_in_grid]]) {
+kernel void nialltl_p2g1(device const float2* positions [[buffer(0)]],
+                         device const float2* velocities [[buffer(1)]],
+                         device const float2x2* Cs [[buffer(2)]],
+                         device float* grid_ms [[buffer(3)]],
+                         device float2* grid_vs [[buffer(4)]],
+                         constant const UniformGrid2DParams& ug_params [[buffer(5)]],
+                         constant const MpmFluidParams& mpm_params [[buffer(6)]],
+                         const uint tid [[thread_position_in_grid]]) {
     const int p_i = (int)tid;
     if (p_i >= mpm_params.particles_count) {
         return;
@@ -70,14 +70,14 @@ kernel void mpm_fluid_p2g1(device const float2* positions [[buffer(0)]],
     }
 }
 
-kernel void mpm_fluid_p2g2(device const float2* positions [[buffer(0)]],
-                           device const float2* velocities [[buffer(1)]],
-                           device const float2x2* Cs [[buffer(2)]],
-                           device float* grid_ms [[buffer(3)]],
-                           device float2* grid_vs [[buffer(4)]],
-                           constant const UniformGrid2DParams& ug_params [[buffer(5)]],
-                           constant const MpmFluidParams& mpm_params [[buffer(6)]],
-                           const uint tid [[thread_position_in_grid]]) {
+kernel void nialltl_p2g2(device const float2* positions [[buffer(0)]],
+                         device const float2* velocities [[buffer(1)]],
+                         device const float2x2* Cs [[buffer(2)]],
+                         device float* grid_ms [[buffer(3)]],
+                         device float2* grid_vs [[buffer(4)]],
+                         constant const UniformGrid2DParams& ug_params [[buffer(5)]],
+                         constant const MpmFluidParams& mpm_params [[buffer(6)]],
+                         const uint tid [[thread_position_in_grid]]) {
     const int p_i = (int)tid;
     if (p_i >= mpm_params.particles_count) {
         return;
@@ -143,26 +143,26 @@ kernel void mpm_fluid_p2g2(device const float2* positions [[buffer(0)]],
     }
 }
 
-kernel void mpm_fluid_advect(device float* grid_ms [[buffer(0)]],
-                             device float2* grid_vs [[buffer(1)]],
-                             constant const UniformGrid2DParams& ug_params [[buffer(2)]],
-                             constant const MpmFluidParams& mpm_params [[buffer(3)]],
-                             constant const float2& gravity [[buffer(4)]],
-                             const uint tid [[thread_position_in_grid]]) {
+kernel void nialltl_advect(device float* grid_ms [[buffer(0)]],
+                           device float2* grid_vs [[buffer(1)]],
+                           constant const UniformGrid2DParams& ug_params [[buffer(2)]],
+                           constant const MpmFluidParams& mpm_params [[buffer(3)]],
+                           constant const float2& gravity [[buffer(4)]],
+                           const uint tid [[thread_position_in_grid]]) {
     AdvectionParams adv_params;
     adv_params.timestep = mpm_params.timestep;
     adv_params.gravity = gravity;
     run_advection(grid_ms, grid_vs, ug_params, adv_params, tid);
 }
 
-kernel void mpm_fluid_g2p(device float2* positions [[buffer(0)]],
-                          device float2* velocities [[buffer(1)]],
-                          device float2x2* Cs [[buffer(2)]],
-                          device const float* grid_ms [[buffer(3)]],
-                          device const float2* grid_vs [[buffer(4)]],
-                          constant const UniformGrid2DParams& ug_params [[buffer(5)]],
-                          constant const MpmFluidParams& mpm_params [[buffer(6)]],
-                          const uint tid [[thread_position_in_grid]]) {
+kernel void nialltl_g2p(device float2* positions [[buffer(0)]],
+                        device float2* velocities [[buffer(1)]],
+                        device float2x2* Cs [[buffer(2)]],
+                        device const float* grid_ms [[buffer(3)]],
+                        device const float2* grid_vs [[buffer(4)]],
+                        constant const UniformGrid2DParams& ug_params [[buffer(5)]],
+                        constant const MpmFluidParams& mpm_params [[buffer(6)]],
+                        const uint tid [[thread_position_in_grid]]) {
     const int p_i = (int)tid;
     if (p_i >= mpm_params.particles_count) {
         return;

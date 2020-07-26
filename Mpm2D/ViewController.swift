@@ -99,7 +99,7 @@ class ViewController: UIViewController {
                     .set(transferrable)
                     .build(self.device)
             }
-            return MpmFluidSolverBuilder()
+            return MpmNialltlSolverBuilder()
                 .set(self.uniformGridPack)
                 .set(itersCount: 2)
                 .set(particlesCount: kParticlesCount)

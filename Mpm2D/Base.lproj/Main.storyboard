@@ -16,13 +16,13 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="dlp-fa-vwt">
-                                <rect key="frame" x="139.5" y="815" width="135" height="32"/>
+                                <rect key="frame" x="117.5" y="815" width="179" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="31" id="oLq-cm-y3P"/>
                                 </constraints>
                                 <segments>
-                                    <segment title="MPM88"/>
-                                    <segment title="Fluid"/>
+                                    <segment title="mpm88"/>
+                                    <segment title="mpm-nialltl"/>
                                 </segments>
                                 <connections>
                                     <action selector="onPickerIndexChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="Dys-Is-ELd"/>

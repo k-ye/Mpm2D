@@ -155,7 +155,7 @@ class Mpm2DTransferrableData {
 // MPM88 Solver
 // https://github.com/taichi-dev/taichi/blob/master/examples/mpm88.py
 class Mpm88SolverBuilder {
-    fileprivate var params = Mpm88Solver.Params()
+    fileprivate var params = Mpm88Impl.Params()
     fileprivate var ug: UniformGrid2DParamsHMPack!
     fileprivate var itersCount: Int = .zero
     fileprivate var transferrable: Mpm2DTransferrableData?
@@ -201,11 +201,11 @@ class Mpm88SolverBuilder {
     
     func build(_ device: MTLDevice) -> Mpm2DSolver {
         self.params.volume = volume
-        return Mpm88Solver(self, device)
+        return Mpm88Impl(self, device)
     }
 }
 
-fileprivate class Mpm88Solver: Mpm2DSolver {
+fileprivate class Mpm88Impl: Mpm2DSolver {
     struct Params {
         var particlesCount: HMInt = .zero
         var timestep: Float = .zero
@@ -246,9 +246,9 @@ fileprivate class Mpm88Solver: Mpm2DSolver {
             sharedBuilder.ug = b.ug
         }
         sharedBuilder.kernelNames = [
-            Mpm88Solver.kP2gKernel,
-            Mpm88Solver.kAdvectKernel,
-            Mpm88Solver.kG2pKernel,
+            Mpm88Impl.kP2gKernel,
+            Mpm88Impl.kAdvectKernel,
+            Mpm88Impl.kG2pKernel,
         ]
         self.shared = sharedBuilder.build(device)
         
@@ -280,7 +280,7 @@ fileprivate class Mpm88Solver: Mpm2DSolver {
     
     private func p2g(_ commandBuffer: MTLCommandBuffer) {
         let commandEncoder = commandBuffer.makeComputeCommandEncoder()!
-        let pipelineState = shared.getKernel(Mpm88Solver.kP2gKernel)
+        let pipelineState = shared.getKernel(Mpm88Impl.kP2gKernel)
         commandEncoder.setComputePipelineState(pipelineState)
         let buffers = [
             positionsBuffer,
@@ -297,12 +297,12 @@ fileprivate class Mpm88Solver: Mpm2DSolver {
     }
     
     private func advect(_ commandBuffer: MTLCommandBuffer) {
-        shared.advect(name: Mpm88Solver.kAdvectKernel, paramsBuffer, commandBuffer)
+        shared.advect(name: Mpm88Impl.kAdvectKernel, paramsBuffer, commandBuffer)
     }
     
     private func g2p(_ commandBuffer: MTLCommandBuffer) {
         let commandEncoder = commandBuffer.makeComputeCommandEncoder()!
-        let pipelineState = shared.getKernel(Mpm88Solver.kG2pKernel)
+        let pipelineState = shared.getKernel(Mpm88Impl.kG2pKernel)
         commandEncoder.setComputePipelineState(pipelineState)
         let buffers = [
             positionsBuffer,
@@ -321,8 +321,8 @@ fileprivate class Mpm88Solver: Mpm2DSolver {
 
 // MPM Fluid
 // https://nialltl.neocities.org/articles/mpm_guide.html
-class MpmFluidSolverBuilder {
-    fileprivate var params = MpmFluidSolver.Params()
+class MpmNialltlSolverBuilder {
+    fileprivate var params = MpmNialltlImpl.Params()
     fileprivate var ug: UniformGrid2DParamsHMPack!
     fileprivate var itersCount: Int = .zero
     fileprivate var transferrable: Mpm2DTransferrableData?
@@ -331,58 +331,58 @@ class MpmFluidSolverBuilder {
         get { return volumeOfCell(ug) }
     }
     
-    func set(_ ugParamsPack: UniformGrid2DParamsHMPack) -> MpmFluidSolverBuilder {
+    func set(_ ugParamsPack: UniformGrid2DParamsHMPack) -> MpmNialltlSolverBuilder {
         self.ug = ugParamsPack
         return self
     }
-    func set(itersCount: Int) -> MpmFluidSolverBuilder {
+    func set(itersCount: Int) -> MpmNialltlSolverBuilder {
         self.itersCount = itersCount
         return self
     }
 
-    func set(particlesCount: Int) -> MpmFluidSolverBuilder {
+    func set(particlesCount: Int) -> MpmNialltlSolverBuilder {
         self.params.particlesCount = Int32(particlesCount)
         return self
     }
     
-    func set(timestep: Float) -> MpmFluidSolverBuilder {
+    func set(timestep: Float) -> MpmNialltlSolverBuilder {
         self.params.timestep = timestep
         return self
     }
     
-    func set(restDensity: Float) -> MpmFluidSolverBuilder {
+    func set(restDensity: Float) -> MpmNialltlSolverBuilder {
         self.params.restDensity = restDensity
         self.params.mass = restDensity * volume
         return self
     }
     
-    func set(dynamicViscosity: Float) -> MpmFluidSolverBuilder {
+    func set(dynamicViscosity: Float) -> MpmNialltlSolverBuilder {
         self.params.dynamicViscosity = dynamicViscosity
         return self
     }
     
-    func set(eosStiffness: Float) -> MpmFluidSolverBuilder {
+    func set(eosStiffness: Float) -> MpmNialltlSolverBuilder {
         self.params.eosStiffness = eosStiffness
         return self
     }
     
-    func set(eosPower: Float) -> MpmFluidSolverBuilder {
+    func set(eosPower: Float) -> MpmNialltlSolverBuilder {
         self.params.eosPower = eosPower
         return self
     }
     
-    func set(_ transferrable: Mpm2DTransferrableData?) -> MpmFluidSolverBuilder {
+    func set(_ transferrable: Mpm2DTransferrableData?) -> MpmNialltlSolverBuilder {
         self.transferrable = transferrable
         return self
     }
     
     func build(_ device: MTLDevice) -> Mpm2DSolver {
         self.params.volume = volume
-        return MpmFluidSolver(self, device)
+        return MpmNialltlImpl(self, device)
     }
 }
 
-fileprivate class MpmFluidSolver: Mpm2DSolver {
+fileprivate class MpmNialltlImpl: Mpm2DSolver {
     struct Params {
         var particlesCount: HMInt = .zero
         var timestep: Float = .zero
@@ -396,10 +396,10 @@ fileprivate class MpmFluidSolver: Mpm2DSolver {
         var eosPower: Float = .zero
     }
     
-    static let kP2g1Kernel = "mpm_fluid_p2g1"
-    static let kP2g2Kernel = "mpm_fluid_p2g2"
-    static let kAdvectKernel = "mpm_fluid_advect"
-    static let kG2pKernel = "mpm_fluid_g2p"
+    static let kP2g1Kernel = "nialltl_p2g1"
+    static let kP2g2Kernel = "nialltl_p2g2"
+    static let kAdvectKernel = "nialltl_advect"
+    static let kG2pKernel = "nialltl_g2p"
     
     var particlesCount: Int {
         get { return shared.particlesCount }
@@ -415,7 +415,7 @@ fileprivate class MpmFluidSolver: Mpm2DSolver {
     let itersCount: Int
     let shared: Mpm2DSolverShared
 
-    init(_ b: MpmFluidSolverBuilder, _ device: MTLDevice) {
+    init(_ b: MpmNialltlSolverBuilder, _ device: MTLDevice) {
         self.params = b.params
         self.paramsBuffer = device.makeBuffer(bytes: &params, length: MemoryLayout<Params>.stride, options: [])!
         self.itersCount = b.itersCount
@@ -428,10 +428,10 @@ fileprivate class MpmFluidSolver: Mpm2DSolver {
             sharedBuilder.ug = b.ug
         }
         sharedBuilder.kernelNames = [
-            MpmFluidSolver.kP2g1Kernel,
-            MpmFluidSolver.kP2g2Kernel,
-            MpmFluidSolver.kAdvectKernel,
-            MpmFluidSolver.kG2pKernel,
+            MpmNialltlImpl.kP2g1Kernel,
+            MpmNialltlImpl.kP2g2Kernel,
+            MpmNialltlImpl.kAdvectKernel,
+            MpmNialltlImpl.kG2pKernel,
         ]
         self.shared = sharedBuilder.build(device)
     }
@@ -461,7 +461,7 @@ fileprivate class MpmFluidSolver: Mpm2DSolver {
     
     private func p2g1(_ commandBuffer: MTLCommandBuffer) {
         let commandEncoder = commandBuffer.makeComputeCommandEncoder()!
-        let pipelineState = shared.getKernel(MpmFluidSolver.kP2g1Kernel)
+        let pipelineState = shared.getKernel(MpmNialltlImpl.kP2g1Kernel)
         commandEncoder.setComputePipelineState(pipelineState)
         let buffers = [
             positionsBuffer,
@@ -478,7 +478,7 @@ fileprivate class MpmFluidSolver: Mpm2DSolver {
 
     private func p2g2(_ commandBuffer: MTLCommandBuffer) {
         let commandEncoder = commandBuffer.makeComputeCommandEncoder()!
-        let pipelineState = shared.getKernel(MpmFluidSolver.kP2g2Kernel)
+        let pipelineState = shared.getKernel(MpmNialltlImpl.kP2g2Kernel)
         commandEncoder.setComputePipelineState(pipelineState)
         let buffers = [
             positionsBuffer,
@@ -494,12 +494,12 @@ fileprivate class MpmFluidSolver: Mpm2DSolver {
     }
     
     private func advect(_ commandBuffer: MTLCommandBuffer) {
-        shared.advect(name: MpmFluidSolver.kAdvectKernel, paramsBuffer, commandBuffer)
+        shared.advect(name: MpmNialltlImpl.kAdvectKernel, paramsBuffer, commandBuffer)
     }
     
     private func g2p(_ commandBuffer: MTLCommandBuffer) {
         let commandEncoder = commandBuffer.makeComputeCommandEncoder()!
-        let pipelineState = shared.getKernel(MpmFluidSolver.kG2pKernel)
+        let pipelineState = shared.getKernel(MpmNialltlImpl.kG2pKernel)
         commandEncoder.setComputePipelineState(pipelineState)
         let buffers = [
             positionsBuffer,

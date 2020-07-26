@@ -22,7 +22,7 @@
 		2142E1C124CBB253000D75D1 /* Render2D.metal in Sources */ = {isa = PBXBuildFile; fileRef = 2142E1C024CBB253000D75D1 /* Render2D.metal */; };
 		2142E1C324CBBA6C000D75D1 /* MetalExts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2142E1C224CBBA6C000D75D1 /* MetalExts.swift */; };
 		2142E1C524CBEF4F000D75D1 /* ParticlesRenderer2D.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2142E1C424CBEF4F000D75D1 /* ParticlesRenderer2D.swift */; };
-		21FA20CE24CC784F002F747F /* MpmFluid.metal in Sources */ = {isa = PBXBuildFile; fileRef = 21FA20CD24CC784F002F747F /* MpmFluid.metal */; };
+		21FA20CE24CC784F002F747F /* MpmNialltl.metal in Sources */ = {isa = PBXBuildFile; fileRef = 21FA20CD24CC784F002F747F /* MpmNialltl.metal */; };
 		21FA20D024CC7859002F747F /* Mpm88.metal in Sources */ = {isa = PBXBuildFile; fileRef = 21FA20CF24CC7859002F747F /* Mpm88.metal */; };
 		21FA20D324CD0AE7002F747F /* Mpm2DShared.metal in Sources */ = {isa = PBXBuildFile; fileRef = 21FA20D224CD0AE7002F747F /* Mpm2DShared.metal */; };
 /* End PBXBuildFile section */
@@ -59,7 +59,7 @@
 		2142E1C024CBB253000D75D1 /* Render2D.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Render2D.metal; sourceTree = "<group>"; };
 		2142E1C224CBBA6C000D75D1 /* MetalExts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalExts.swift; sourceTree = "<group>"; };
 		2142E1C424CBEF4F000D75D1 /* ParticlesRenderer2D.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticlesRenderer2D.swift; sourceTree = "<group>"; };
-		21FA20CD24CC784F002F747F /* MpmFluid.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = MpmFluid.metal; sourceTree = "<group>"; };
+		21FA20CD24CC784F002F747F /* MpmNialltl.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = MpmNialltl.metal; sourceTree = "<group>"; };
 		21FA20CF24CC7859002F747F /* Mpm88.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Mpm88.metal; sourceTree = "<group>"; };
 		21FA20D124CD0ADB002F747F /* Mpm2DShared.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Mpm2DShared.h; sourceTree = "<group>"; };
 		21FA20D224CD0AE7002F747F /* Mpm2DShared.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Mpm2DShared.metal; sourceTree = "<group>"; };
@@ -137,7 +137,7 @@
 				21FA20D124CD0ADB002F747F /* Mpm2DShared.h */,
 				21FA20D224CD0AE7002F747F /* Mpm2DShared.metal */,
 				21FA20CF24CC7859002F747F /* Mpm88.metal */,
-				21FA20CD24CC784F002F747F /* MpmFluid.metal */,
+				21FA20CD24CC784F002F747F /* MpmNialltl.metal */,
 				2142E1C024CBB253000D75D1 /* Render2D.metal */,
 				2142E1BA24CBAADD000D75D1 /* UniformGrid2D.h */,
 				2142E1BF24CBAFCE000D75D1 /* Utils.h */,
@@ -255,7 +255,7 @@
 				2142E1B724CBA90D000D75D1 /* Types.swift in Sources */,
 				2142E1BE24CBAFC7000D75D1 /* Utils.metal in Sources */,
 				2142E1B324CBA877000D75D1 /* Mpm2DSolver.swift in Sources */,
-				21FA20CE24CC784F002F747F /* MpmFluid.metal in Sources */,
+				21FA20CE24CC784F002F747F /* MpmNialltl.metal in Sources */,
 				2142E1C524CBEF4F000D75D1 /* ParticlesRenderer2D.swift in Sources */,
 				2142E1B924CBAA54000D75D1 /* UniformGrid2DParams.swift in Sources */,
 				2142E19124CB9F6B000D75D1 /* SceneDelegate.swift in Sources */,
