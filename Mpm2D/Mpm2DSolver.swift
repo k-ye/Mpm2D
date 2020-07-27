@@ -106,7 +106,8 @@ fileprivate class Mpm2DSolverShared {
     }
     
     func set(gravity: Float2) {
-        let g = normalize(gravity) * kGravityStrength
+        let strength = Float.minimum(length(gravity) * 5.0, kGravityStrength)
+        let g = normalize(gravity) * strength
         gravityBuffer.toMutablePtr(type: Float2.self, count: 1)[0] = g
     }
     
